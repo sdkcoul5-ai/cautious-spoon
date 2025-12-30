@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MALIBABA - Shopping en ligne</title>
+    <style>
+        /* --- RESET & BASES --- */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-color: #FF6600; 
+            --primary-dark: #e55c00;
+            --price-color: #FF3300;
+            
+            /* Thème Clair */
+            --bg-color: #f2f2f2;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #ddd;
+            --trash-color: #999;
+        }
+
+        /* --- MODE SOMBRE --- */
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --text-color: #ffffff;
+            --border-color: #333;
+            --trash-color: #ff4d4d;
+        }
+
+        /* --- STRUCTURE PRINCIPALE ADAPTATIVE --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    padding-bottom: 80px;
+    transition: 0.3s;
+    
+    /* SOLUTION : On utilise des unités relatives (%) au lieu de pixels fixes */
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centre le contenu si l'écran est géant */
+}
+
+.app-container {
+    width: 100%;
+    /* Si l'écran est petit (tel), il prend 100%. 
+       Si l'écran est grand (ordi ou mode ordi), il reste large et lisible */
+    max-width: 100%; 
+    min-height: 100vh;
+    background-color: var(--bg-color);
+}
+
+/* --- GRILLE : C'est ici qu'on gère le "Mode Ordi" --- */
+.product-grid {
+    display: grid !important;
+    /* On dit : "Fais des colonnes d'au moins 160px de large, et remplis tout l'espace" */
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important;
+    gap: 12px;
+    padding: 12px;
+    width: 100%;
+}
+
+/* On ajuste les éléments fixes pour qu'ils ne flottent pas */
+.header-top, .bottom-nav, .contact-bar, .search-container, .filters-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    left: 0 !important;
+    transform: none !important;
+}
+
+
+        /* --- CONTENEUR --- */
+        .app-container {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* --- HEADER & NAVIGATION FIXES --- */
+        /* On s'assure qu'ils restent dans les 500px du body */
+        .header-top {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 900;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%;
+        }
+
+        .contact-bar {
+            position: fixed;
+            bottom: 60px; 
+            width: 100%;
+            max-width: 500px; /* Force la largeur max */
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 8px 0;
+            font-size: 13px;
+            z-index: 990;
+            left: 50%;
+            transform: translateX(-50%); /* Centre l'élément fixe */
+        }
+        .contact-bar a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 500px; /* Force la largeur max */
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            left: 50%;
+            transform: translateX(-50%); /* Centre l'élément fixe */
+        }
+
+        .nav-item {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            cursor: pointer;
+            border: none;
+            background: none;
+            padding: 5px;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .nav-icon {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        /* --- ELEMENTS UI --- */
+        .theme-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .trash-btn {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--trash-color);
+        }
+
+        .hero {
+            text-align: center;
+            padding: 30px 20px;
+            background: var(--card-bg);
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .hero h1 { margin: 0; color: var(--primary-color); font-size: 24px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .search-container {
+            padding: 10px 15px;
+            background: var(--bg-color);
+            position: sticky;
+            top: 55px;
+            z-index: 850;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* --- FILTRES --- */
+        .filters-container {
+            background: var(--bg-color); 
+            position: sticky; 
+            top: 115px;
+            z-index: 800;
+            padding-bottom: 10px;
+        }
+
+        .category-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 10px;
+            padding: 5px 15px;
+            scrollbar-width: none;
+        }
+        .category-scroll::-webkit-scrollbar { display: none; }
+
+        .cat-chip {
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-color);
+            transition: 0.3s;
+        }
+        .cat-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+        }
+
+        /* --- GRILLE PRODUITS (FIXE 2 COLONNES) --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Toujours 2 colonnes */
+            gap: 12px;
+            padding: 12px;
+        }
+
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            height: 100%; /* Force la carte à prendre toute la hauteur dispo */
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 160px; /* Hauteur fixe pour uniformiser */
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .product-info {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+
+        .product-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-color);
+            line-height: 1.3;
+            height: 34px; /* Limite à 2 lignes */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price {
+            font-weight: 800;
+            font-size: 15px;
+            color: var(--price-color);
+            margin-top: 5px;
+        }
+
+        .btn-add {
+            margin-top: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+        .btn-add:active { transform: scale(0.95); }
+
+        /* --- PAGES --- */
+        .page { display: none; min-height: 60vh; animation: fadeIn 0.3s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- PANIER --- */
+        #cart { padding: 15px; }
+        .cart-item {
+            background: var(--card-bg);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .qty-btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 25px;
+            height: 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-checkout {
+            background: #25D366;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <div class="contact-bar">
+        <span>Besoin d'aide ? 52 38 80 39 | </span>
+        <a href="https://wa.me/22352388039">WhatsApp</a>
+    </div>
+
+    <div id="home" class="page active">
+        <div class="header-top">
+            <span style="font-weight:900; font-size: 20px;">MALIBABA</span>
+            <button class="theme-btn" onclick="toggleTheme()">🌓 Thème</button>
+        </div>
+        
+        <div class="hero">
+            <h1>Le Géant de Bamako</h1>
+            <p>Tout ce dont vous avez besoin, au meilleur prix.</p>
+        </div>
+
+        <h3 style="padding-left:15px; margin-bottom:0;">🔥 Produits Populaires</h3>
+        <div class="product-grid" id="home-products"></div>
+        
+        <div style="text-align:center; margin: 20px 0;">
+            <button onclick="showPage('categories', document.querySelectorAll('.nav-item')[1])" style="background:none; border:2px solid var(--primary-color); color:var(--text-color); padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
+                Voir tous les produits →
+            </button>
+        </div>
+    </div>
+
+    <div id="categories" class="page">
+        <div class="header-top">
+            <span>Boutique MALIBABA</span>
+            <button class="theme-btn" onclick="toggleTheme()">🌓 Thème</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher un produit..." onkeyup="searchProducts()">
+        </div>
+        
+        <div class="filters-container">
+            <div class="category-scroll">
+                <button class="cat-chip active" onclick="filterProducts('all', this)">Tout voir</button>
+                <button class="cat-chip" onclick="filterProducts('vetements', this)">👕 Mode</button>
+                <button class="cat-chip" onclick="filterProducts('electronique', this)">📱 Électro</button>
+                <button class="cat-chip" onclick="filterProducts('montres', this)">⌚ Bijoux</button>
+                <button class="cat-chip" onclick="filterProducts('beaute', this)">💄 Beauté</button>
+            </div>
+        </div>
+
+        <div class="product-grid" id="cat-products"></div>
+    </div>
+
+    <div id="cart" class="page">
+        <div class="header-top">
+            <span>Mon Panier</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="trash-btn" onclick="clearCart()">🗑️</button>
+                <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+            </div>
+        </div>
+        <div id="cart-items-container">
+            <div style="text-align:center; padding: 50px 20px; color:#999;">
+                <span style="font-size:50px;">🛒</span><br>
+                Votre panier est vide.
+            </div>
+        </div>
+        
+        <div id="cart-summary" style="display:none; margin-top: 20px; background: var(--card-bg); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:18px; margin-bottom:10px;">
+                <span>Total à payer:</span>
+                <span id="cart-total" style="color:var(--primary-color);">0 FCFA</span>
+            </div>
+            <p style="font-size:12px; color:#666; margin:0;">Livraison calculée sur WhatsApp.</p>
+            <button class="btn-checkout" onclick="checkoutWhatsApp()">
+                <span>Commander sur WhatsApp</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="showPage('home', this)">
+            <span class="nav-icon">🏠</span>
+            Accueil
+        </button>
+        <button class="nav-item" onclick="showPage('categories', this)">
+            <span class="nav-icon">🛍️</span>
+            Boutique
+        </button>
+        <button class="nav-item" onclick="showPage('cart', this)">
+            <span class="nav-icon">🛒</span>
+            Panier <span id="cart-bubble" style="background:var(--primary-color); color:white; border-radius:50%; padding:0 5px; font-size:10px; display:none; position:absolute; margin-top:-10px;">0</span>
+        </button>
+    </div>
+
+</div> 
+
+<script>
+    // --- DONNÉES PRODUITS ---
+    const products = [
+        { id: 1, name: "Talons Luxe Bihs", price: 1999, category: "vetements", img: "talons.jpg" },
+        { id: 2, name: "Sandales Homme Cuir", price: 6999, category: "vetements", img: "sandales.jpg" },
+        { id: 3, name: "Bazin Riche (5 mètres)", price: 15000, category: "vetements", img: "bazin.jpg" },
+        { id: 4, name: "Ensemble Complet Marron", price: 20000, category: "vetements", img: "ensemblemarron.jpg" },
+        { id: 5, name: "Sac à main Fashion", price: 4500, category: "vetements", img: "sac.jpg" },
+        { id: 21, name: "Paire de Basket", price: 15000, category: "vetements", img: "basket.jpg" },
+        { id: 22, name: "Sac à dos", price: 10000, category: "vetements", img: "sacDos.jpg" },
+        { id: 6, name: "Montre VIP", price: 12000, category: "montres", img: "montreVip.jpg" },
+        { id: 7, name: "Montre Sport Digital", price: 3000, category: "montres", img: "montreSport.jpg" },
+        { id: 8, name: "Chaine Plaqué Or", price: 8000, category: "montres", img: "chaine.jpg" },
+        { id: 9, name: "AirPods Pro", price: 5000, category: "electronique", img: "airpods.jpg" },
+        { id: 10, name: "Smart Watch T500", price: 7500, category: "electronique", img: "smartWatch.jpg" },
+        { id: 11, name: "PowerBank 20000mAh", price: 7500, category: "electronique", img: "20000mah.jpg" },
+        { id: 12, name: "IPhone 14 Pro Max", price: 250000, category: "electronique", img: "iPhone14.jpg" },
+        { id: 17, name: "Casque Bluetooth", price: 9500, category: "electronique", img: "casque.jpg" },
+        { id: 18, name: "Casque Chat Bluetooth", price: 14500, category: "electronique", img: "casqueChat.jpg" },
+        { id: 19, name: "Écouteur Bluetooth Noir", price: 7500, category: "electronique", img: "bluetooth.jpg" },
+        { id: 20, name: "Écouteur Bluetooth Écran", price: 10000, category: "electronique", img: "bluetoothEcran.jpg" },
+        { id: 23, name: "Ventilateur Fraîcheur", price: 10000, category: "electronique", img: "ventilateur.jpg" },
+        { id: 24, name: "Pochette Imperméable", price: 2500, category: "electronique", img: "coque.jpg" },
+        { id: 26, name: "Épilatoire", price: 5000, category: "beaute", img: "epi.jpg" },
+        { id: 25, name: "Pommade Anti-Graisse", price: 7500, category: "beaute", img: "hotGel.jpg" },
+        { id: 13, name: "Parfum Harem 100ml", price: 3500, category: "beaute", img: "harem.jpg" },
+        { id: 14, name: "Kit Maquillage Complet", price: 10000, category: "beaute", img: "maquillage.jpg" },
+        { id: 15, name: "Savon Éclaircissant", price: 1500, category: "beaute", img: "savoneclaircissant.jpg" },
+        { id: 16, name: "Perruque Lisse 18p", price: 25000, category: "beaute", img: "perruque.jpg" },
+    ];
+
+    let cart = [];
+
+    // --- MOTEUR D'AFFICHAGE ---
+    function renderProductCard(p) {
+        // Fallback image si l'image locale n'existe pas encore (pour le test)
+        // Utilise p.img normalement, ici j'ajoute un onerror pour que ce soit joli même sans tes fichiers
+        return `
+        <div class="product-card">
+            <img src="${p.img}" alt="${p.name}" class="product-img" onerror="this.src='https://placehold.co/150x150?text=MALIBABA'">
+            <div class="product-info">
+                <div>
+                    <div class="product-title">${p.name}</div>
+                    <div class="product-price">${p.price} FCFA</div>
+                </div>
+                <button class="btn-add" onclick="addToCart(${p.id})">AJOUTER</button>
+            </div>
+        </div>
+        `;
+    }
+
+    function displayList(list, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        if (list.length === 0) {
+            container.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:20px;">Aucun produit trouvé.</p>';
+        } else {
+            container.innerHTML = list.map(p => renderProductCard(p)).join('');
+        }
+    }
+
+    // --- INITIALISATION ---
+    function init() {
+        // MODIFICATION ICI : On affiche 8 produits au lieu de 4 pour combler le vide
+        displayList(products.slice(0, 8), 'home-products'); 
+        displayList(products, 'cat-products');
+        
+        const savedCart = localStorage.getItem('malibaba_cart');
+        if(savedCart) {
+            cart = JSON.parse(savedCart);
+            updateCartUI();
+        }
+    }
+
+    // --- THEME & NAVIGATION ---
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+    }
+
+    function searchProducts() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const filtered = products.filter(p => 
+            p.name.toLowerCase().includes(query) || 
+            p.category.toLowerCase().includes(query)
+        );
+        displayList(filtered, 'cat-products');
+        document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+    }
+
+    function showPage(pageId, btn) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        if(btn) btn.classList.add('active'); // Vérification si btn existe
+        
+        window.scrollTo(0, 0);
+    }
+
+    function filterProducts(category, btn) {
+        document.getElementById('searchInput').value = "";
+        document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filtered = category === 'all' ? products : products.filter(p => p.category === category);
+        displayList(filtered, 'cat-products');
+    }
+
+    // --- PANIER (Logique identique) ---
+    function addToCart(id) {
+        let existingItem = cart.find(item => item.id === id);
+        if (existingItem) {
+            existingItem.qty++;
+        } else {
+            let product = products.find(p => p.id === id);
+            cart.push({ ...product, qty: 1 });
+        }
+        updateCartUI();
+        
+        const btn = event.target;
+        const originalText = btn.innerText;
+        btn.innerText = "AJOUTÉ !";
+        btn.style.background = "#25D366";
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.style.background = ""; 
+        }, 800);
+    }
+
+    function increaseQty(id) {
+        let item = cart.find(i => i.id === id);
+        if(item) { item.qty++; updateCartUI(); }
+    }
+
+    function decreaseQty(id) {
+        let item = cart.find(i => i.id === id);
+        if(item) {
+            item.qty--;
+            if(item.qty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            }
+            updateCartUI();
+        }
+    }
+
+    function clearCart() {
+        if(cart.length === 0) return;
+        if(confirm("⚠️ Vider tout le panier ?")) {
+            cart = [];
+            updateCartUI();
+        }
+    }
+
+    function updateCartUI() {
+        localStorage.setItem('malibaba_cart', JSON.stringify(cart));
+
+        const totalCount = cart.reduce((acc, item) => acc + item.qty, 0);
+        const bubble = document.getElementById('cart-bubble');
+        
+        if(totalCount > 0) {
+            bubble.innerText = totalCount;
+            bubble.style.display = "inline-block";
+        } else {
+            bubble.style.display = "none";
+        }
+
+        const container = document.getElementById('cart-items-container');
+        const summary = document.getElementById('cart-summary');
+        
+        if (cart.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding: 50px 20px; color:#999;"><span style="font-size:50px;">🛒</span><br>Votre panier est vide.</div>';
+            summary.style.display = 'none';
+            document.getElementById('cart-total').innerText = "0 FCFA";
+            return;
+        }
+
+        let html = '';
+        let total = 0;
+        
+        cart.forEach((item) => {
+            let itemTotal = item.price * item.qty;
+            total += itemTotal;
+            html += `
+            <div class="cart-item">
+                <img src="${item.img}" onerror="this.src='https://placehold.co/50'" style="width:50px; height:50px; object-fit:cover; border-radius:5px; margin-right:10px; background:#eee;">
+                <div style="flex-grow:1;">
+                    <div style="font-weight:bold; font-size:14px; color:var(--text-color);">${item.name}</div>
+                    <div style="color:#666; font-size:12px;">${item.price} x ${item.qty} = <b style="color:var(--text-color)">${itemTotal} F</b></div>
+                </div>
+                <div class="qty-controls">
+                    <button class="qty-btn" onclick="decreaseQty(${item.id})">-</button>
+                    <span style="font-weight:bold; font-size:14px;">${item.qty}</span>
+                    <button class="qty-btn" onclick="increaseQty(${item.id})">+</button>
+                </div>
+            </div>`;
+        });
+
+        container.innerHTML = html;
+        document.getElementById('cart-total').innerText = total + " FCFA";
+        summary.style.display = 'block';
+    }
+
+    function checkoutWhatsApp() {
+        if(cart.length === 0) return;
+        const phone = "22352388039"; 
+        let message = "Bonjour MALIBABA, voici ma commande :\n\n";
+        let total = 0;
+
+        cart.forEach(item => {
+            let sousTotal = item.price * item.qty;
+            message += `▪️ ${item.name} (x${item.qty}) : ${sousTotal} F\n`;
+            total += sousTotal;
+        });
+
+        message += `\n💰 *TOTAL GLOBAL : ${total} FCFA*`;
+        message += "\n📍 Je suis à Bamako, quartier :";
+        
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
